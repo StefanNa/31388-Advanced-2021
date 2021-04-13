@@ -1,0 +1,45 @@
+array "guidemarkX" 15
+array "guidemarkY" 15
+array "guidemarkTh" 15
+guidemarkX[1]=-0.50
+guidemarkY[1]=1.60
+guidemarkTh[1]=0.00
+guidemarkX[2]=0.50
+guidemarkY[2]=1.60
+guidemarkTh[2]=3.14
+guidemarkX[3]=3.50
+guidemarkY[3]=1.60
+guidemarkTh[3]=0.00
+guidemarkX[4]=4.50
+guidemarkY[4]=1.60
+guidemarkTh[4]=3.14
+guidemarkX[5]=-0.50
+guidemarkY[5]=3.50
+guidemarkTh[5]=0.00
+guidemarkX[6]=0.45
+guidemarkY[6]=3.50
+guidemarkTh[6]=3.14
+guidemarkX[7]=3.55
+guidemarkY[7]=3.50
+guidemarkTh[7]=0.00
+guidemarkX[8]=4.50
+guidemarkY[8]=3.50
+guidemarkTh[8]=3.14
+guidemarkX[9]=0.45
+guidemarkY[9]=4.65
+guidemarkTh[9]=3.14
+guidemarkX[10]=3.55
+guidemarkY[10]=4.65
+guidemarkTh[10]=0.00
+guidemarkX[11]=0.45
+guidemarkY[11]=4.65
+guidemarkTh[11]=1.57
+guidemarkX[12]=3.55
+guidemarkY[12]=4.65
+guidemarkTh[12]=1.57
+guidemarkX[13]=1.20
+guidemarkY[13]=4.00
+guidemarkTh[13]=0.00
+guidemarkX[14]=2.80
+guidemarkY[14]=4.00
+guidemarkTh[14]=3.14
