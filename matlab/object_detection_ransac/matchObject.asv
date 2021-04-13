@@ -1,0 +1,15 @@
+function objectNumber = matchObject(sortedLengths,objectLengths, lineAngles, rightAngleThreshold)
+    cornerAngle = abs(lineAngles(1) - lineAngles(2));
+    if cornerAngle > rightAngleThreshold
+        objectLenghts([
+    end
+    error = sortedLengths - objectLengths';
+    match_error = vecnorm(error);
+    [~, min_index] = min(match_error);
+    if min_index > 2
+        
+    end
+    
+    objectNumber = min_index;
+end
+

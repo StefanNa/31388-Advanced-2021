@@ -42,7 +42,7 @@ objLengths = [0.15 0.4;
               0.15 norm([0.15 0.3]);
               0.3 norm([0.15 0.3])];
 objIds = [1 1 2 2 3 4 3 3 4 4];
-angleOffsets = [-pi/2 -pi/2 -pi/2 -pi/2 -pi/2 -pi/2 pi-atan(.4/.1) pi/2+atan(.1/.4) pi-atan(.3/.15) pi/2+atan(.15/.3)];
+angleOffsets = [-pi/2 -pi/2 -pi/2 -pi/2 -pi/2 -pi/2 -atan(.4/.1) pi/2+atan(.1/.4) -atan(.3/.15) pi/2+atan(.15/.3)];
 positionOffsets = [-0.2 0.0725;
                    0.2 0.0725;
                    -0.15 0.1;
@@ -57,7 +57,7 @@ positionOffsets = [-0.2 0.0725;
 % drawObject(obj4);
 % hold on
 
-translated_object = translateObject(obj4, 1, 0.8, pi/2.2);
+translated_object = translateObject(obj3, 1, 0.8, pi/2.2);
 figure(1)
 drawObject(translated_object);
 hold on
