@@ -1,0 +1,94 @@
+array "guidemarkX" 14
+array "guidemarkY" 14
+array "guidemarkTh" 14
+guidemarkX[1]=-0.50
+guidemarkY[1]=1.60
+guidemarkTh[1]=0.00
+guidemarkX[2]=0.30
+guidemarkY[2]=1.60
+guidemarkTh[2]=3.14
+guidemarkX[3]=3.70
+guidemarkY[3]=1.60
+guidemarkTh[3]=0.00
+guidemarkX[4]=4.50
+guidemarkY[4]=1.60
+guidemarkTh[4]=3.14
+guidemarkX[5]=-0.50
+guidemarkY[5]=3.50
+guidemarkTh[5]=0.00
+guidemarkX[6]=0.30
+guidemarkY[6]=3.50
+guidemarkTh[6]=3.14
+guidemarkX[7]=3.70
+guidemarkY[7]=3.50
+guidemarkTh[7]=0.00
+guidemarkX[8]=4.50
+guidemarkY[8]=3.50
+guidemarkTh[8]=3.14
+guidemarkX[9]=0.30
+guidemarkY[9]=4.65
+guidemarkTh[9]=3.14
+guidemarkX[10]=3.70
+guidemarkY[10]=4.65
+guidemarkTh[10]=0.00
+guidemarkX[11]=0.30
+guidemarkY[11]=4.65
+guidemarkTh[11]=1.57
+guidemarkX[12]=3.70
+guidemarkY[12]=4.65
+guidemarkTh[12]=1.57
+guidemarkX[13]=1.20
+guidemarkY[13]=4.00
+guidemarkTh[13]=0.00
+guidemarkX[14]=2.80
+guidemarkY[14]=4.00
+guidemarkTh[14]=3.14
+
+laser "setinitpose x=0.3 y=0.3 th=0"
+laser "setinitcov Cx=0.001 Cy=0.001 Cth=0.001"
+laser "push t='0.1' cmd='localize'"
+wait 1
+
+guidemark = 3
+
+goto "main"
+
+label "gotoGuidemark"
+endx = guidemarkX[guidemark]
+endy = guidemarkY[guidemark]
+
+label "followroute"
+startx = $odox + 0.3
+starty = $odoy + 0.3
+stringcat "findroute startx=" startx " starty=" starty " endx=" endx " endy=" endy
+laser "$string"
+wait 0.1
+N = $l4
+label "gotoGuidemarkLoop"
+stringcat "getpoint p=" N
+laser "$string"
+wait 0.1
+drivew $l5 $l6 $l7 "rad": ($targetdist < 0.25)
+N = N-1
+if (N >0) "gotoGuidemarkLoop"
+laser "getpoint p=0"
+wait 0.1
+drivew $l5 $l6 $l7 "rad": ($targetdist < 0.05)
+return
+
+
+label "main"
+label "followMarksLoop"
+call "gotoGuidemark"
+turnAngle = guidemarkTh[guidemark] - $odoth
+turn turnAngle "rad"
+newGuidemark = $fiducialid
+eval newGuidemark
+if (newGuidemark == guidemark | newGuidemark == 98 | newGuidemark == -1) "followMarksDone"
+guidemark = newGuidemark
+goto "followMarksLoop"
+label "followMarksDone"
+
+endx = 0.3
+endy = 0.3
+call "followroute"
