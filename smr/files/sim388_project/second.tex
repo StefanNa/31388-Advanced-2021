@@ -1,0 +1,15 @@
+
+%1
+% edited simconfig to <params name="smr0" robotpose="1.29  1.0 0.0 " wheelbase="0.26" encresolution="0.00010245"/>
+% then I rotated the smr 
+% mrc1 turn 90
+% at wall  l3="0.457" l4="0.449" l5="0.457"
+% mrc1 turn -90
+% turned 90 deg l0="1.929" l1="1.005" l2="0.741" l3="0.65"
+
+laser "scanpush cmd='zoneobst' "
+wait 1
+fwd 0.1 @v0.3
+laser "scanpush cmd='zoneobst' "
+wait 1
+stop
