@@ -24,9 +24,14 @@
 
 #include <ulms4/ufunclaserbase.h>
 #include <urob4/uresposehist.h>
+#include<vector>
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+#include <stdio.h>
+#include <algorithm>
 
-
-
+using namespace std;
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
@@ -67,6 +72,23 @@ public:
     UVariable *var_rect;
     UResPoseHist * poseHist;
 };
+
+class ObjectDetection {
+public:
+  
+  vector<double> getLinebasic(double x1, double y1, double x2, double y2);
+
+ 
+  double pointLineDis(double x, double y, vector<double> line);
+
+
+  vector<double> lsqLine(vector<double> X, vector<double> Y);
+
+  vector<vector<double>> ransac(vector<double> X, vector<double> Y,int maxlines ,int randcouples, float thresh, int minLineSup,int minNoPoints);
+
+
+};
+
 
 
 
