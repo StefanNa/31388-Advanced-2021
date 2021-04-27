@@ -18,13 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "boxDetect_final.h"
+#include "objectDetection.h"
 #include <vector>
 using namespace std;
 
 #ifdef LIBRARY_OPEN_NEEDED
-
-vector<double> X;
-vector<double> Y;
 
 /**
  * This function is needed by the server to create a version of this plugin */
@@ -35,6 +33,8 @@ UFunctionBase * createFunc()
 }
 #endif
 
+vector<double> X;
+vector<double> Y;
 
 bool UFuncboxFinder::setResource(UResBase * resource, bool remove) { // load resource as provided by the server (or other plugins)
 	bool result = true;
@@ -63,13 +63,40 @@ bool UFuncboxFinder::setResource(UResBase * resource, bool remove) { // load res
 ///////////////////////////////////////////////////
 // #define SMRWIDTH 0.4
 bool UFuncboxFinder::handleCommand(UServerInMsg * msg, void * extra)
-{  // handle a plugin command
+{  // handle a plugin command  
   const int MRL = 500;
   char reply[MRL];
+  bool runDetect;
   const int MVL = 30;
   char value[MVL];
   ULaserData * data;
-  
+  //double robotwidth;
+  //
+  //double r,delta;
+  //double minRange; // min range in meter
+  // double minAngle = 0.0; // degrees
+//   double d,robotwidth;
+  //double zone[9];
+  double pose[3];
+  // check for parameters - one parameter is tested for - 'help'
+  runDetect = msg->tag.getAttValue("detect", value, MVL);
+  if (runDetect)
+  { // create the reply in XML-like (html - like) format
+    cout << "running detection";
+    ObjectDetection detection;
+    vector<vector<double>> lines = detection.ransac(X,Y,4,10,0.01,5,5);
+
+    cout << "found " << lines.size() << " lines";
+
+    for (vector<double> line: lines){
+      for (double param: line){
+        cout << param << "\n";
+      }
+      cout << "\n";
+    }
+  }
+  else
+  {
   // define variables
   double x_laser, y_laser, x_world, y_world, r, theta;
   int i;
@@ -99,18 +126,20 @@ bool UFuncboxFinder::handleCommand(UServerInMsg * msg, void * extra)
         Y.push_back(y_world);
       }
     }
-    
+
     // send this string as the reply to the client
     sendMsg(msg, reply);
 
   }
   else
     sendWarning(msg, "No scandata available");
-
+  }
   // return true if the function is handled with a positive result
   // used if scanpush or push has a count of positive results
   return true;
+
 }
+
 
 void UFuncboxFinder::createBaseVar()
 { // add also a global variable (global on laser scanner server) with latest data
