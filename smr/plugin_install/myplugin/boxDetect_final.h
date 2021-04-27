@@ -24,14 +24,8 @@
 
 #include <ulms4/ufunclaserbase.h>
 #include <urob4/uresposehist.h>
-#include<vector>
-#include <iostream>
-#include <string>
-#include <stdlib.h>
-#include <stdio.h>
-#include <algorithm>
 
-using namespace std;
+
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
@@ -41,14 +35,15 @@ using namespace std;
  * simple laser scanner data handling and analysis
  * @author Christian Andersen
 */
-class UFuncrectanglefinder : public UFuncLaserBase
+class UFuncboxFinder : public UFuncLaserBase
 {
 public:
   /**
   Constructor */
-  UFuncrectanglefinder()
+
+  UFuncboxFinder()
   { // set the command (or commands) handled by this plugin
-    setCommand("findrectangle", "findrectangleif", "rectangle detect for MRC (Compiled " __DATE__ " " __TIME__ ")");
+    setCommand("locateBox", "zoneobstif", "obstacle detect for MRC (Compiled " __DATE__ " " __TIME__ ")");
     createBaseVar();
   }
   virtual bool setResource(UResBase * resource, bool remove);
@@ -58,39 +53,13 @@ public:
   Must return true if the function is handled -
   otherwise the client will get a failed - reply */
   virtual bool handleCommand(UServerInMsg * msg, void * extra);
-
-  void polar2crt(ULaserData * data, double result[][2]);
-  int boxFilter(double points[][2], int pointLength, double minX, double maxX, double minY, double maxY, double result[][2]);
-  int conv(double f[], int f_len, double w[], int w_len, double result[]);
-  void getX(double points[][2], int pointLength, double result[]);
-  void getY(double points[][2], int pointLength, double result[]);
-
-  int findMaxIndex(double values[], int length, int skip = 0);
   
   protected:
     void createBaseVar();
-    UVariable *var_rect;
+    UVariable *var_zone;
     UResPoseHist * poseHist;
-};
-
-class ObjectDetection {
-public:
-  
-  vector<double> getLinebasic(double x1, double y1, double x2, double y2);
-
- 
-  double pointLineDis(double x, double y, vector<double> line);
-
-
-  vector<double> lsqLine(vector<double> X, vector<double> Y);
-
-  vector<vector<double>> ransac(vector<double> X, vector<double> Y,int maxlines ,int randcouples, float thresh, int minLineSup,int minNoPoints);
-
 
 };
-
-
-
 
 #endif
 
