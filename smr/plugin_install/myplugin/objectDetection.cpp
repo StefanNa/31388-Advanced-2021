@@ -108,23 +108,48 @@ vector<vector<double>> ObjectDetection::ransac(vector<double> X, vector<double> 
   int maxSupport=0;
   int nlines=0;
   int lineSupport = 0;
+  
+  cout << "X points:\n";
+  cout  << "[";
+  for (int p = 0; p < inside_X.size(); p++) {
+    cout <<inside_X[p] << ", ";
+  }
+  cout << "]"<< "\n";
 
+  cout << "Y points:\n";
+  cout  << "[";
+  for (int p = 0; p < inside_X.size(); p++) {
+    cout <<inside_Y[p] << ", ";
+  }
+  cout << "]"<< "\n";
+
+  // cout << "X points:\n" << inside_X << "\n";
+  // cout << "Y points:\n" << inside_Y << "\n";
+
+  cout << "all points in calculation: " << X.size() << "\n\n";
   // Continue while enough points are left and not too many lines are found
   while (inside_X.size() > minNoPoints && nlines < maxlines) {
+    
+    cout << "num points: " << inside_X.size() << "\n";
+    
+  // for (int nlin = 0; nlin < maxlines; nlin++) {
+    // if (nlines <= maxlines) {
     vector<double> candLine;
     vector<double> X_inliers;
     vector<double> Y_inliers;
     maxSupport=0;
 
     //try a certain amoiunt of random points
-    for (int i = 0; i < randcouples; i++) {
+    for (int a = 0; a < randcouples; a++) {
       //get random points that are not identical
+      // cout << "in for randcouples " << a << "\n";
       int p1 ;
       int p2;
       p1 = rand() % inside_X.size();
       p2 = rand() % inside_X.size();
       while (p1 == p2) {
         p2 = rand() % inside_X.size();
+        // cout << "in while p1p2 " << p1 << " "<< p2 << "\n"; 
       }
       double x1 = inside_X[p1];
       double y1 = inside_Y[p1];
@@ -140,13 +165,17 @@ vector<vector<double>> ObjectDetection::ransac(vector<double> X, vector<double> 
       for (int i = 0; i < inside_X.size(); i++) {
         double dis = pointLineDis(inside_X[i], inside_Y[i], candLine);
         if (dis < thresh) {
+          // cout << "push";
+          // cout << "dis < thresh " << dis << " "<< thresh << "\n";
           X_pre.push_back(inside_X[i]);
           Y_pre.push_back(inside_Y[i]);
           lineSupport++;
+          //cout << lineSupport << "\n";
         }
       }
       // if more inliers than last round, update inliers
       if (lineSupport > maxSupport) {
+        // cout << "support";
         maxSupport = lineSupport;
         X_inliers = X_pre;
         Y_inliers = Y_pre;
@@ -156,16 +185,19 @@ vector<vector<double>> ObjectDetection::ransac(vector<double> X, vector<double> 
   }
 
   // after random repitition if enough inliers, get lsqline
-  if (lineSupport > minLineSup) {
-    
+  
+
+  if (maxSupport > minLineSup) {
+    cout << "support: " << maxSupport <<" minLineSup: " << minLineSup << "\n";
     candLine = lsqLine(X_inliers, Y_inliers);
     Lines.push_back(candLine);
     nlines=nlines+1;
 
     //remove used points from pool for next line
-    for (int i = 0; i < X_inliers.size(); i++) {
+    for (int i_ = 0; i_ < X_inliers.size(); i_++) {
       for (int j = 0; j < inside_X.size(); j++) {
-        if (X_inliers[i] == inside_X[j] && Y_inliers[i] == inside_Y[j]) {
+        //cout << "for for remove " << i_ << " " << j << "\n";
+        if (X_inliers[i_] == inside_X[j] && Y_inliers[i_] == inside_Y[j]) {
           inside_X.erase(inside_X.begin() + j);
           inside_Y.erase(inside_Y.begin() + j);
           break;
@@ -176,5 +208,6 @@ vector<vector<double>> ObjectDetection::ransac(vector<double> X, vector<double> 
   }
   
 }
+cout <<"\n\n\n\n"<<"found " << nlines << "lines" << "\n\n\n\n";
 return Lines;
 }
