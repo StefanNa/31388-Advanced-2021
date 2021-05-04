@@ -4,10 +4,10 @@ array "gmth" 15
 gmx[1]=-0.50
 gmy[1]=1.50
 gmth[1]=0.00
-gmx[2]=0.30
+gmx[2]=0.50
 gmy[2]=1.50
 gmth[2]=3.14
-gmx[3]=3.70
+gmx[3]=3.50
 gmy[3]=1.50
 gmth[3]=0.00
 gmx[4]=4.50
@@ -16,26 +16,26 @@ gmth[4]=3.14
 gmx[5]=-0.50
 gmy[5]=3.50
 gmth[5]=0.00
-gmx[6]=0.30
+gmx[6]=0.45
 gmy[6]=3.50
 gmth[6]=3.14
-gmx[7]=3.70
+gmx[7]=3.55
 gmy[7]=3.50
 gmth[7]=0.00
 gmx[8]=4.50
 gmy[8]=3.50
 gmth[8]=3.14
-gmx[9]=0.30
+gmx[9]=0.45
 gmy[9]=4.65
 gmth[9]=3.14
-gmx[10]=3.70
+gmx[10]=3.55
 gmy[10]=4.65
 gmth[10]=0.00
-gmx[11]=0.40
-gmy[11]=4.5
+gmx[11]=0.45
+gmy[11]=4.65
 gmth[11]=1.57
-gmx[12]=3.60
-gmy[12]=4.5
+gmx[12]=3.55
+gmy[12]=4.65
 gmth[12]=1.57
 gmx[13]=1.20
 gmy[13]=4.00
@@ -46,8 +46,50 @@ gmth[14]=3.14
 
 laser "setinitpose x=0.3 y=0.3 th=0"
 laser "setinitcov Cx=0.001 Cy=0.001 Cth=0.001"
-laser "push t='0.1' cmd='localize'"
+laser "push t='0.5' cmd='localize'"
+wait 0.5
+
+turn 45
+
+wait 0.1
+laser "locateBox"
 wait 1
+
+endx = 3.5
+endy = 0.3
+call "followroute"
+wait 0.1
+theta = 2.35 - $odoth
+turn theta "rad"
+
+wait 0.1
+laser "locateBox"
+wait 0.1
+
+endx = 3.5
+endy = 2.2
+call "followroute"
+wait 0.1
+theta = 3.93 - $odoth
+turn theta "rad"
+
+wait 0.1
+laser "locateBox"
+wait 0.1
+
+endx = 0.3
+endy = 2.2
+call "followroute"
+wait 0.1
+theta = -0.75 - $odoth
+turn theta "rad"
+
+wait 0.1
+laser "locateBox"
+wait 0.5
+
+laser "locateBox detect"
+wait 0.5
 
 guidemark = 1
 
