@@ -8,7 +8,7 @@ AUROBOTDIR = ../../aurobotservers/trunk
 BINDIR = ../bin
 #
 # preprocessor flags like -I(include dir)
-CPPFLAGS =  -I$(AUROBOTDIR)/include  -I/usr/include/opencv2
+CPPFLAGS =  -I$(AUROBOTDIR)/include  -I/usr/include/opencv2 
 #
 # linker flags like e.g. -lpthread and -L/usr/local/lib
 LDFLAGS = -g0 -shared -Wl,-soname,$(libname)
@@ -30,7 +30,7 @@ include ../../aurobotservers/trunk/include/opencv_flags.mk
 # endif
 #
 # Object files to produce before link
-objects = ufuncrectanglefinder.o
+objects = boxDetect_final.o objectDetection.o
 
 # shared library file name (version 0)
 shlib = $(libname).0
