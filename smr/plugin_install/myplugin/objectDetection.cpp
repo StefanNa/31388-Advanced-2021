@@ -109,14 +109,14 @@ vector<vector<double>> ObjectDetection::ransac(vector<double> X, vector<double> 
   int nlines=0;
   int lineSupport = 0;
   
-  cout << "X points:\n";
+  cout << "X_points=";
   cout  << "[";
   for (int p = 0; p < inside_X.size(); p++) {
     cout <<inside_X[p] << ", ";
   }
   cout << "]"<< "\n";
 
-  cout << "Y points:\n";
+  cout << "Y_points=";
   cout  << "[";
   for (int p = 0; p < inside_X.size(); p++) {
     cout <<inside_Y[p] << ", ";
@@ -129,14 +129,16 @@ vector<vector<double>> ObjectDetection::ransac(vector<double> X, vector<double> 
   cout << "all points in calculation: " << X.size() << "\n\n";
   // Continue while enough points are left and not too many lines are found
   while (inside_X.size() > minNoPoints && nlines < maxlines) {
+  // for (int line_ = 0; line_ < maxlines; line_++) {
     
-    cout << "num points: " << inside_X.size() << "\n";
+    // cout << "num points: " << inside_X.size() << "\n";
     
   // for (int nlin = 0; nlin < maxlines; nlin++) {
     // if (nlines <= maxlines) {
     vector<double> candLine;
     vector<double> X_inliers;
     vector<double> Y_inliers;
+    
     maxSupport=0;
 
     //try a certain amoiunt of random points
@@ -189,7 +191,28 @@ vector<vector<double>> ObjectDetection::ransac(vector<double> X, vector<double> 
 
   if (maxSupport > minLineSup) {
     cout << "support: " << maxSupport <<" minLineSup: " << minLineSup << "\n";
-    candLine = lsqLine(X_inliers, Y_inliers);
+    int oldSupport=0;
+    do{
+      oldSupport = lineSupport;
+      candLine = lsqLine(X_inliers, Y_inliers);
+      
+      vector<double> X_pre;
+      vector<double> Y_pre;
+      int lineSupport=0;
+      for (int i = 0; i < inside_X.size(); i++) {
+        double dis = pointLineDis(inside_X[i], inside_Y[i], candLine);
+        if (dis < thresh) {
+          // cout << "push";
+          // cout << "dis < thresh " << dis << " "<< thresh << "\n";
+          X_pre.push_back(inside_X[i]);
+          Y_pre.push_back(inside_Y[i]);
+          lineSupport++;
+          //cout << lineSupport << "\n";
+        }
+      }
+      X_inliers = X_pre;
+      Y_inliers = Y_pre;
+    }while(lineSupport != oldSupport);
     Lines.push_back(candLine);
     nlines=nlines+1;
 
@@ -211,3 +234,67 @@ vector<vector<double>> ObjectDetection::ransac(vector<double> X, vector<double> 
 cout <<"\n\n\n\n"<<"found " << nlines << "lines" << "\n\n\n\n";
 return Lines;
 }
+
+
+vector<vector<double>> ObjectDetection::identification(vector<vector<double>> Lines) {
+int numBoxLines = Lines.size(); //size(box_lines,2);
+int object=0;
+vector<vector<double>> Lines_in=Lines;
+vector<vector<double>> intersectPoints;
+double x0=0;
+double y0=0;
+
+// intersectPoints = zeros(2,numBoxLines);
+int cornerCount = 1;
+for (int idx = 0; idx < numBoxLines; idx++) {
+    for (int jdx = idx+1; jdx < numBoxLines; jdx++) {
+        vector<double> x0y0;
+        x0=(Lines_in[idx][1]*Lines_in[jdx][2]-Lines_in[idx][2]*Lines_in[jdx][1])/(Lines_in[idx][0]*Lines_in[jdx][1]-Lines_in[idx][1]*Lines_in[jdx][0]);
+        y0=(Lines_in[idx][2]*Lines_in[jdx][0]-Lines_in[idx][0]*Lines_in[jdx][2])/(Lines_in[idx][0]*Lines_in[jdx][1]-Lines_in[idx][1]*Lines_in[jdx][0]);
+        x0y0.push_back(x0);
+        x0y0.push_back(y0);
+        if(x0y0[0] > 0 && x0y0[0] < 10 && x0y0[1] > 0 && x0y0[1] < 10){
+            intersectPoints.push_back(x0y0);
+        }
+
+    }
+  }
+cornerCount=intersectPoints.size();
+
+// pose = mean(intersectPoints,2);
+// c1 = intersectPoints(:,1);
+// c2s = intersectPoints(:,2:end);
+// dists = sqrt(sum((c2s-c1).^2));
+// [sortedDists,distIndex] = sort(dists);
+// c2 = c2s(:,distIndex(2));
+// side = c2 - c1;
+// pose(3) = atan2(side(2),side(1));
+
+vector<double> pose;
+double x=0;
+double y=0;
+
+
+if(cornerCount == 4){
+  //mean
+for (int id = 0; id < cornerCount; id++) {
+    x=x+intersectPoints[id][0];
+    y=y+intersectPoints[id][1];
+}
+pose.push_back(x/cornerCount);
+pose.push_back(y/cornerCount);
+
+intersectPoints.push_back(pose);
+
+
+
+}
+else if (cornerCount == 3){
+
+}
+
+
+
+return intersectPoints;
+}
+
