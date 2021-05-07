@@ -46,14 +46,16 @@ gmth[14]=3.14
 
 laser "setinitpose x=0.3 y=0.3 th=0"
 laser "setinitcov Cx=0.001 Cy=0.001 Cth=0.001"
-laser "push t='0.5' cmd='localize'"
+laser "push t='0.1' cmd='localize'"
 wait 0.5
 
 turn 45
 
 wait 0.1
 laser "locateBox"
-wait 1
+wait 0.1
+laser "locateBox"
+wait 0.5
 
 endx = 3.5
 endy = 0.3
@@ -65,6 +67,9 @@ turn theta "rad"
 wait 0.1
 laser "locateBox"
 wait 0.1
+laser "locateBox"
+wait 0.5
+
 
 endx = 3.5
 endy = 2.2
@@ -76,6 +81,8 @@ turn theta "rad"
 wait 0.1
 laser "locateBox"
 wait 0.1
+laser "locateBox"
+wait 0.5
 
 endx = 0.3
 endy = 2.2
@@ -86,10 +93,14 @@ turn theta "rad"
 
 wait 0.1
 laser "locateBox"
+wait 0.1
+laser "locateBox"
 wait 0.5
 
 laser "locateBox detect"
-wait 0.5
+wait 5
+
+exit
 
 guidemark = 1
 

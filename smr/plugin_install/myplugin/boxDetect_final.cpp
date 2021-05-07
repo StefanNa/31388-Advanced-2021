@@ -37,24 +37,24 @@ vector<double> X;
 vector<double> Y;
 
 bool UFuncboxFinder::setResource(UResBase * resource, bool remove) { // load resource as provided by the server (or other plugins)
-  bool result = true;
+	bool result = true;
 
-  if (resource->isA(UResPoseHist::getMapPoseID())) { // pointer to server the resource that this plugin can provide too
-    // but as there might be more plugins that can provide the same resource
-    // use the provided
-    if (remove)
-      // the resource is unloaded, so reference must be removed
-      poseHist = NULL;
-    else if (poseHist != (UResPoseHist *) resource)
-      // resource is new or is moved, save the new reference
-      poseHist = (UResPoseHist *) resource;
-    else
-      // reference is not used
-      result = false;
-  }
-  // other resource types may be needed by base function.
-  result = UFunctionBase::setResource(resource, remove);
-  return result;
+	if (resource->isA(UResPoseHist::getMapPoseID())) { // pointer to server the resource that this plugin can provide too
+		// but as there might be more plugins that can provide the same resource
+		// use the provided
+		if (remove)
+			// the resource is unloaded, so reference must be removed
+			poseHist = NULL;
+		else if (poseHist != (UResPoseHist *) resource)
+			// resource is new or is moved, save the new reference
+			poseHist = (UResPoseHist *) resource;
+		else
+			// reference is not used
+			result = false;
+	}
+	// other resource types may be needed by base function.
+	result = UFunctionBase::setResource(resource, remove);
+	return result;
 }
 
 ///////////////////////////////////////////////////
@@ -84,16 +84,19 @@ bool UFuncboxFinder::handleCommand(UServerInMsg * msg, void * extra)
   { // create the reply in XML-like (html - like) format
     cout << "running detection";
     ObjectDetection detection;
-    vector<vector<double>> lines = detection.ransac(X,Y,4,10000,0.005,30,10);
+    vector<vector<double>> lines = detection.ransac(X,Y,4,30000,0.01,10,10);
 
     cout << "found " << lines.size() << " lines";
 
+    cout << "lines = ["  << " \n";
+
     for (vector<double> line: lines){
       for (double param: line){
-        cout << param << "\n";
+        cout << param << ",";
       }
-      cout << "\n";
+      cout << ";\n";
     }
+    cout << "]"  << " \n";
     vector<vector<double>> intersectPoints = detection.identification(lines);
 
     cout << "found " << intersectPoints.size() << " intersects";

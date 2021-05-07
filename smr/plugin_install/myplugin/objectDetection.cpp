@@ -31,25 +31,22 @@ vector<double> ObjectDetection::getLinebasic(double x1, double y1, double x2, do
 // Ax+By+C=0
 // Distance=abs(A * x + B * y + C)/sqrt(A * A + B * B)
 double ObjectDetection::pointLineDis(double x, double y, vector<double> line) {
-  double distance = 0;
-  double A = line[0];
-  double B = line[1];
-  double C = line[2];
-  double numerator = fabs(A * x + B * y + C);
-  double deniminator = sqrt(A * A + B * B);
-  distance = numerator / deniminator;
-  return distance;
+  return fabs(cos(line[0])*x+sin(line[0])*y -line[1]);
+  
 }
 
 
 // Ax+By+C=0
 //line[0]x - line[1]y + line[2] = 0
 vector<double> ObjectDetection::lsqLine(vector<double> X, vector<double> Y) {
-  vector<double> lsqLine(3, 0);
+  vector<double> lsqLine(2, 0);
 
   int n = X.size();
   double sumX = 0;
   double sumY = 0;
+  double sumX2 = 0;
+  double sumY2 = 0;
+  double sumXY = 0;
   double meanX = 0; 
   double meanY = 0;
   double covXY = 0; 
@@ -57,38 +54,61 @@ vector<double> ObjectDetection::lsqLine(vector<double> X, vector<double> Y) {
   double varY = 0;
   double A = 0; 
   double C = 0;
+  double alpha;
+  double r;
 
   for (int i = 0; i < n; i++) {
     sumX += X[i];
     sumY += Y[i];
-  }
-  meanX = sumX / n;
-  meanY = sumY / n;
-  for (int i = 0; i < n; i++) {
-    covXY += (X[i] - meanX)*(Y[i] - meanY);
-    varX += (X[i] - meanX) * (X[i] - meanX);
-    varY += (Y[i] - meanY) * (Y[i] - meanY);
+    sumX2 += X[i]*X[i];
+    sumY2 += Y[i]*Y[i];
+    sumXY += X[i]*Y[i];
+
   }
 
-  if (varX < 0.00001) { //the line is parallel to y axis
-    lsqLine[0] = -1;
-    lsqLine[1] = 0;
-    lsqLine[2] = meanX;
-  }
-  else if (varY < 0.00001) {//the line is parallel to x axis
-    lsqLine[0] = 0;
-    lsqLine[1] = -1;
-    lsqLine[2] = meanY;
-  }
-  else {
-    A = covXY / varX;
-    //C = - By_ - Ax_ --> Ax + By + C = 0 ; B =-1
-    C = meanY - A * meanX;
-    lsqLine[0] = A;
-    lsqLine[1] = -1;
-    lsqLine[2] = C;
-  }
-  return lsqLine;
+alpha=0.5*atan2(2*sumX*sumY-2*n*sumXY,sumX*sumX-sumY*sumY-n*sumX2+n*sumY2);
+
+
+  meanX = sumX / double(n);
+  meanY = sumY / double(n);
+
+  r=meanX*cos(alpha)+meanY*sin(alpha);
+
+  if (r < 0){
+    r=r*-1;
+    if(alpha<0){
+            alpha = alpha + 3.141593;}
+    else{
+            alpha = alpha - 3.141593;}
+    }
+lsqLine[0]=alpha;
+lsqLine[1]=r;
+
+  // for (int i = 0; i < n; i++) {
+  //   covXY += (X[i] - meanX)*(Y[i] - meanY)/double(n);
+  //   varX += (X[i] - meanX) * (X[i] - meanX)/double(n);
+  //   varY += (Y[i] - meanY) * (Y[i] - meanY)/double(n);
+  // }
+
+  // if (varX ==0) { //the line is parallel to y axis
+  //   lsqLine[0] = -1;
+  //   lsqLine[1] = 0;
+  //   lsqLine[2] = meanX;
+  // }
+  // else if (varY ==0) {//the line is parallel to x axis
+  //   lsqLine[0] = 0;
+  //   lsqLine[1] = -1;
+  //   lsqLine[2] = meanY;
+  // }
+  // else {
+  //   A = covXY / varX;
+  //   //C = - By_ - Ax_ --> Ax + By + C = 0 ; B =-1
+  //   C = meanY - A * meanX;
+  //   lsqLine[0] = A;
+  //   lsqLine[1] = -1;
+  //   lsqLine[2] = C;
+  // }
+ return lsqLine;
 }
 
 
@@ -128,8 +148,11 @@ vector<vector<double>> ObjectDetection::ransac(vector<double> X, vector<double> 
 
   cout << "all points in calculation: " << X.size() << "\n\n";
   // Continue while enough points are left and not too many lines are found
-  while (inside_X.size() > minNoPoints && nlines < maxlines) {
-  // for (int line_ = 0; line_ < maxlines; line_++) {
+  // while (inside_X.size() > minNoPoints && nlines < maxlines) {
+  for (int line_ = 0; line_ < maxlines; line_++) {
+    if (inside_X.size() < minNoPoints){
+      break;
+    }
     
     // cout << "num points: " << inside_X.size() << "\n";
     
@@ -158,7 +181,14 @@ vector<vector<double>> ObjectDetection::ransac(vector<double> X, vector<double> 
       double x2 = inside_X[p2];
       double y2 = inside_Y[p2];
       //get simple line from 2 points
-      candLine = getLinebasic(x1, y1, x2, y2);
+      vector<double> X_first(2, 0);
+      vector<double> Y_first(2, 0);
+      X_first[0]=x1;
+      X_first[1]=x2;
+      Y_first[0]=y1;
+      Y_first[1]=y2;
+    
+      candLine = lsqLine(X_first, Y_first);
 
       int lineSupport = 0;
       vector<double> X_pre;
@@ -212,6 +242,7 @@ vector<vector<double>> ObjectDetection::ransac(vector<double> X, vector<double> 
       }
       X_inliers = X_pre;
       Y_inliers = Y_pre;
+      candLine = lsqLine(X_inliers, Y_inliers);
     }while(lineSupport != oldSupport);
     Lines.push_back(candLine);
     nlines=nlines+1;
@@ -248,12 +279,18 @@ double y0=0;
 int cornerCount = 1;
 for (int idx = 0; idx < numBoxLines; idx++) {
     for (int jdx = idx+1; jdx < numBoxLines; jdx++) {
+        double r1=Lines_in[idx][1];
+        double a1=Lines_in[idx][0];
+
+        double r2=Lines_in[jdx][1];
+        double a2=Lines_in[jdx][0];
+        y0=(r1*cos(a2)-r2*cos(a1))/(sin(a1)*cos(a2)-sin(a2)*cos(a1));
+        x0=(r1-y0*sin(a1))/cos(a1);
+
         vector<double> x0y0;
-        x0=(Lines_in[idx][1]*Lines_in[jdx][2]-Lines_in[idx][2]*Lines_in[jdx][1])/(Lines_in[idx][0]*Lines_in[jdx][1]-Lines_in[idx][1]*Lines_in[jdx][0]);
-        y0=(Lines_in[idx][2]*Lines_in[jdx][0]-Lines_in[idx][0]*Lines_in[jdx][2])/(Lines_in[idx][0]*Lines_in[jdx][1]-Lines_in[idx][1]*Lines_in[jdx][0]);
         x0y0.push_back(x0);
         x0y0.push_back(y0);
-        if(x0y0[0] > 0 && x0y0[0] < 10 && x0y0[1] > 0 && x0y0[1] < 10){
+        if(x0y0[0] > 0.8 && x0y0[0] < 3.2 && x0y0[1] > 0.8 && x0y0[1] < 2.2){
             intersectPoints.push_back(x0y0);
         }
 
@@ -284,7 +321,7 @@ for (int id = 0; id < cornerCount; id++) {
 pose.push_back(x/cornerCount);
 pose.push_back(y/cornerCount);
 
-intersectPoints.push_back(pose);
+// intersectPoints.push_back(pose);
 
 
 

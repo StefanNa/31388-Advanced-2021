@@ -5,18 +5,37 @@ laser "push t='1.0' cmd='localize'"
 laser "push t='1.0' cmd='locateBox'"
 wait 1
 
-%ignoreobstacles
-%turn 90
-%ignoreobstacles
-%fwd 1.0
-%ignoreobstacles
-%turn -90
-
 ignoreobstacles
 turn 90
-
+ignoreobstacles
+fwd 1.0
 ignoreobstacles
 turn -90
+
+
+%ignoreobstacles
+%fwd 2.8
+
+%ignoreobstacles
+%turn 90
+
+%ignoreobstacles
+%fwd 1.9
+
+%ignoreobstacles
+%turn 90
+
+%ignoreobstacles
+%fwd 2.8
+
+%ignoreobstacles
+%turn 90
+
+%ignoreobstacles
+%fwd 1.9
+
+%ignoreobstacles
+%turn 90
 
 laser "locateBox detect"
 wait 1
