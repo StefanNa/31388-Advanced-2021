@@ -46,12 +46,15 @@ public:
  
   double pointLineDis(double x, double y, vector<double> line);
 
+int getIndex(vector<double> v, int K);
 
   vector<double> lsqLine(vector<double> X, vector<double> Y);
 
   vector<vector<double>> ransac(vector<double> X, vector<double> Y,int maxlines ,int randcouples, float thresh, int minLineSup,int minNoPoints);
 
   vector<vector<double>> identification(vector<vector<double>> Lines);
+
+  
 
 };  
 

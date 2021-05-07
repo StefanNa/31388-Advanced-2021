@@ -269,7 +269,7 @@ return Lines;
 
 vector<vector<double>> ObjectDetection::identification(vector<vector<double>> Lines) {
 int numBoxLines = Lines.size(); //size(box_lines,2);
-int object=0;
+int objectType=0;
 vector<vector<double>> Lines_in=Lines;
 vector<vector<double>> intersectPoints;
 double x0=0;
@@ -308,26 +308,59 @@ cornerCount=intersectPoints.size();
 // pose(3) = atan2(side(2),side(1));
 
 vector<double> pose;
+vector<double> dists;
+double dist=0;
+double distmax=0;
 double x=0;
 double y=0;
 
+vector<double> c1={intersectPoints[0][0],intersectPoints[0][1]};
+vector<double> c2(2,0);
 
 if(cornerCount == 4){
   //mean
 for (int id = 0; id < cornerCount; id++) {
     x=x+intersectPoints[id][0];
     y=y+intersectPoints[id][1];
+    if (id <=0){
+      dist=sqrt(pow(c1[0]-intersectPoints[id][0],2) +pow(c1[1]-intersectPoints[id][1],2));
+      dists.push_back(dist);
+    }
 }
 pose.push_back(x/cornerCount);
 pose.push_back(y/cornerCount);
 
+sort(dists.begin(), dists.end());
+int locC2=getIndex(dists, 1);
+c2=intersectPoints[locC2];
+vector<double> side = {c2[0] - c1[0],c2[1] - c1[1]};
+pose.push_back(atan2(side[1],side[0]));
+double pi=3.141593;
+if (pose[2] > pi/2)
+        {pose[2] = pose[2] - pi;}
+if (pose[2] < -pi/2)
+        {pose[2] = pose[2] + pi;}
+if (dists[0] > 0.175)
+        {objectType = 2;}
+    else
+        {objectType = 1;}
 // intersectPoints.push_back(pose);
 
 
 
 }
 else if (cornerCount == 3){
-
+for (int id = 0; id < cornerCount; id++) {
+    vector<double> c1={intersectPoints[id][0],intersectPoints[id][1]};
+    if (id !=id){
+      
+    }
+    x=x+intersectPoints[id][0];
+    y=y+intersectPoints[id][1];
+    if (id <=0){
+      dist=sqrt(pow(c1[0]-intersectPoints[id][0],2) +pow(c1[1]-intersectPoints[id][1],2));
+      dists.push_back(dist);
+    }
 }
 
 
@@ -335,3 +368,23 @@ else if (cornerCount == 3){
 return intersectPoints;
 }
 
+int ObjectDetection::getIndex(vector<double> v, int K){
+  int index=0;
+    auto it = find(v.begin(), v.end(), K);
+ 
+    // If element was found
+    if (it != v.end())
+    {
+     
+        // calculating the index
+        // of K
+        int index = it - v.begin();
+        
+    }
+    else {
+        // If the element is not
+        // present in the vector
+        int index=-1;
+    }
+    return index;
+}
