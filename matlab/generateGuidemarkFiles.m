@@ -2,12 +2,12 @@ loadWorldInfo
 
 guidemarkFd = fopen("smrGuidemarks", "w+");
 
-fprintf(guidemarkFd, 'array "guidemarkX" %d\n', size(guidemarks,1)+1);
-fprintf(guidemarkFd, 'array "guidemarkY" %d\n', size(guidemarks,1)+1);
-fprintf(guidemarkFd, 'array "guidemarkTh" %d\n', size(guidemarks,1)+1);
+fprintf(guidemarkFd, 'array "gmx" %d\n', size(guidemarks,1)+1);
+fprintf(guidemarkFd, 'array "gmy" %d\n', size(guidemarks,1)+1);
+fprintf(guidemarkFd, 'array "gmth" %d\n', size(guidemarks,1)+1);
 
 for idx=1:size(guidemarks,1)
-    fprintf(guidemarkFd, "guidemarkX[%d]=%.2f\n", idx, guidemarks(idx,1));
-    fprintf(guidemarkFd, "guidemarkY[%d]=%.2f\n", idx, guidemarks(idx,2));
-    fprintf(guidemarkFd, "guidemarkTh[%d]=%.2f\n", idx, guidemarks(idx,3)/180*pi);
+    fprintf(guidemarkFd, "gmx[%d]=%.2f\n", idx, guidemarks(idx,1));
+    fprintf(guidemarkFd, "gmy[%d]=%.2f\n", idx, guidemarks(idx,2));
+    fprintf(guidemarkFd, "gmth[%d]=%.2f\n", idx, guidemarks(idx,3)/180*pi);
 end
