@@ -97,14 +97,12 @@ bool UFuncboxFinder::handleCommand(UServerInMsg * msg, void * extra)
       cout << ";\n";
     }
     cout << "]"  << " \n";
-    vector<vector<double>> intersectPoints = detection.identification(lines);
+    vector<double> intersectPoints = detection.identification(lines);
 
-    cout << "found " << intersectPoints.size() << " intersects";
+    cout << "found Pose and Object type \n";
 
-    for (vector<double> point: intersectPoints){
-      for (double param: point){
-        cout << param << "\n";
-      }
+    for (double point: intersectPoints){
+        cout << point << "\n";
       cout << "\n";
     }
 

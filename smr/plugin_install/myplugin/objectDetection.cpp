@@ -267,7 +267,7 @@ return Lines;
 }
 
 
-vector<vector<double>> ObjectDetection::identification(vector<vector<double>> Lines) {
+vector<double> ObjectDetection::identification(vector<vector<double>> Lines) {
 int numBoxLines = Lines.size(); //size(box_lines,2);
 int objectType=0;
 vector<vector<double>> Lines_in=Lines;
@@ -316,31 +316,36 @@ double y=0;
 
 vector<double> c1={intersectPoints[0][0],intersectPoints[0][1]};
 vector<double> c2(2,0);
-
 if(cornerCount == 4){
   //mean
+  double minDist=1000;
+  int minDistidx=0;
 for (int id = 0; id < cornerCount; id++) {
     x=x+intersectPoints[id][0];
     y=y+intersectPoints[id][1];
-    if (id <=0){
+    if (id !=0){
       dist=sqrt(pow(c1[0]-intersectPoints[id][0],2) +pow(c1[1]-intersectPoints[id][1],2));
-      dists.push_back(dist);
+      if (dist<minDist){
+        minDist=dist;
+        minDistidx=id;
+      }
     }
 }
+
+
 pose.push_back(x/cornerCount);
 pose.push_back(y/cornerCount);
 
-sort(dists.begin(), dists.end());
-int locC2=getIndex(dists, 1);
-c2=intersectPoints[locC2];
+
+c2=intersectPoints.at(minDistidx);
 vector<double> side = {c2[0] - c1[0],c2[1] - c1[1]};
-pose.push_back(atan2(side[1],side[0]));
 double pi=3.141593;
+pose.push_back(atan2(side[1],side[0])-(pi/2));
 if (pose[2] > pi/2)
         {pose[2] = pose[2] - pi;}
 if (pose[2] < -pi/2)
         {pose[2] = pose[2] + pi;}
-if (dists[0] > 0.175)
+if (minDist > 0.175)
         {objectType = 2;}
     else
         {objectType = 1;}
@@ -350,22 +355,63 @@ if (dists[0] > 0.175)
 
 }
 else if (cornerCount == 3){
+double minCorner=1000;
+int minCornerid=1;
+int sideIdx;
+double angle;
+double Xcoord;
+double Ycoord;
+
 for (int id = 0; id < cornerCount; id++) {
     vector<double> c1={intersectPoints[id][0],intersectPoints[id][1]};
-    if (id !=id){
-      
+    vector<vector<double>> sides;
+    for (int id2 = 0; id2 < cornerCount; id2++) {
+
+      if (id2 !=id){
+        sides.push_back({intersectPoints[id2][0]-c1[0],intersectPoints[id2][1]-c1[1]});
     }
-    x=x+intersectPoints[id][0];
-    y=y+intersectPoints[id][1];
-    if (id <=0){
-      dist=sqrt(pow(c1[0]-intersectPoints[id][0],2) +pow(c1[1]-intersectPoints[id][1],2));
-      dists.push_back(dist);
+
     }
+    double corner=fabs(sides[0][0]*sides[1][0]+sides[0][1]*sides[1][1]);
+    if (corner < minCorner){
+      minCorner = corner;
+      minCornerid = id;
+      double dist1= sqrt(pow(sides[0][0],2)+pow(sides[0][1],2));
+      double dist2= sqrt(pow(sides[1][0],2)+pow(sides[1][1],2));
+      if (dist1>dist2){
+        sideIdx=0;
+        if (dist1>0.35){
+          objectType = 3;
+        }
+        else{
+          objectType = 4;
+        }
+      }
+      else{
+        sideIdx=1;
+        if (dist2>0.35){
+          objectType = 3;
+        }
+        else{
+          objectType = 4;
+        }
+      }
+      angle=atan2(sides[sideIdx][1],sides[sideIdx][0]);
+      Xcoord=c1[0];
+      Ycoord=c1[1];
+
+    }
+
 }
+pose.push_back(Xcoord);
+pose.push_back(Ycoord);
+pose.push_back(angle);
+
+}
+pose.push_back(objectType);
 
 
-
-return intersectPoints;
+return pose;
 }
 
 int ObjectDetection::getIndex(vector<double> v, int K){

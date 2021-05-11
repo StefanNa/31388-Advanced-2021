@@ -97,10 +97,7 @@ wait 0.1
 laser "locateBox"
 wait 0.5
 
-laser "locateBox detect"
-wait 5
 
-exit
 
 guidemark = 1
 
@@ -151,3 +148,7 @@ label "followMarksDone"
 endx = 0.3
 endy = 0.3
 call "followroute"
+
+stop 
+laser "locateBox detect"
+wait 1
